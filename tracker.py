@@ -32,6 +32,19 @@ def add_expense(description, amount):
     save_expenses(expenses)
     print(f"✅ Expense added successfully (ID: {new_id})")
 
+def list_expenses():
+    expenses = load_expenses()
+
+    if not expenses:
+        print("📭 No expenses found.")
+        return
+
+    print(f"{'ID':<4} {'Date':<12} {'Description':<15} {'Amount'}")
+    print("-" * 45)
+    for expense in expenses:
+        print(f"{expense['id']:<4} {expense['date']:<12} {expense['description']:<15} ${expense['amount']:.2f}")
+
+
 # 🔹 Main CLI Handler
 def main():
     if len(sys.argv) >= 2 and sys.argv[1] == "add":
@@ -49,8 +62,15 @@ def main():
                 print("❗ Invalid usage. Please provide both description and amount.")
         else:
             print("❗ Usage: python tracker.py add --description <desc> --amount <amt>")
+    
+    elif sys.argv[1] == "list":
+        list_expenses()
+    
     else:
         print("❗ Unknown command. Supported: add")
+
+    
+
 
 if __name__ == "__main__":
     main()
