@@ -57,6 +57,11 @@ def delete_expense(expense_id):
         save_expenses(expenses)
         print(f"🗑️ Expense with ID {expense_id} deleted successfully.")
 
+def show_summary():
+    expenses = load_expenses()
+    total = sum(e["amount"] for e in expenses)
+    print(f"💰 Total expenses: ${total:.2f}")
+
 
 # 🔹 Main CLI Handler
 def main():
@@ -88,11 +93,14 @@ def main():
             except (IndexError, ValueError):
                 print("❗ Usage: python tracker.py delete --id <expense_id>")
         else:
-         print("❗ Missing --id argument.")
+            print("❗ Missing --id argument.")
+        
+    elif sys.argv[1] == "summary":
+        show_summary()
 
     # Handle unknown commands
     else:
-        print("❗ Unknown command. Supported: add, list, delete")
+        print("❗ Unknown command. Supported: add, list, delete, summary")
 
     
 
