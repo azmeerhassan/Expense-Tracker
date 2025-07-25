@@ -44,6 +44,19 @@ def list_expenses():
     for expense in expenses:
         print(f"{expense['id']:<4} {expense['date']:<12} {expense['description']:<15} ${expense['amount']:.2f}")
 
+def delete_expense(expense_id):
+    expenses = load_expenses()
+    original_len = len(expenses)
+
+    # Filter out the expense with matching ID
+    expenses = [e for e in expenses if e["id"] != expense_id]
+
+    if len(expenses) == original_len:
+        print(f"❌ No expense found with ID {expense_id}.")
+    else:
+        save_expenses(expenses)
+        print(f"🗑️ Expense with ID {expense_id} deleted successfully.")
+
 
 # 🔹 Main CLI Handler
 def main():
@@ -65,9 +78,21 @@ def main():
     
     elif sys.argv[1] == "list":
         list_expenses()
-    
+
+    elif sys.argv[1] == "delete":
+        if "--id" in sys.argv:
+            try:
+                idx = sys.argv.index("--id")
+                expense_id = int(sys.argv[idx + 1])
+                delete_expense(expense_id)
+            except (IndexError, ValueError):
+                print("❗ Usage: python tracker.py delete --id <expense_id>")
+        else:
+         print("❗ Missing --id argument.")
+
+    # Handle unknown commands
     else:
-        print("❗ Unknown command. Supported: add")
+        print("❗ Unknown command. Supported: add, list, delete")
 
     
 
