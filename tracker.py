@@ -84,6 +84,28 @@ def show_summary(month=None):
         total = sum(e["amount"] for e in expenses)
         print(f"💰 Total expenses: ${total:.2f}")
 
+def update_expense(expense_id, new_description=None, new_amount=None):
+    expenses = load_expenses()
+    updated = False
+
+    for expense in expenses:
+        if expense["id"] == expense_id:
+            if new_description:
+                expense["description"] = new_description
+            if new_amount is not None:
+                if new_amount < 0:
+                    print("❗ Amount cannot be negative.")
+                    return
+                expense["amount"] = new_amount
+            updated = True
+            break
+
+    if updated:
+        save_expenses(expenses)
+        print("✅ Expense updated successfully.")
+    else:
+        print("❌ Expense not found.")
+
 
 
 # 🔹 Main CLI Handler
@@ -125,8 +147,37 @@ def main():
                 show_summary(sys.argv[idx + 1])
         else:
             print("❗ Please provide a month number after --month")
+    elif sys.argv[1] == "update":
+        if "--id" in sys.argv:
+            try:
+                idx = sys.argv.index("--id")
+                expense_id = int(sys.argv[idx + 1])
+            except (IndexError, ValueError):
+                print("❗ Please provide a valid ID after --id.")
+                return
+
+            new_desc = None
+            new_amount = None
+
+            if "--description" in sys.argv:
+                desc_idx = sys.argv.index("--description")
+                if desc_idx + 1 < len(sys.argv):
+                    new_desc = sys.argv[desc_idx + 1]
+
+            if "--amount" in sys.argv:
+                amt_idx = sys.argv.index("--amount")
+                try:
+                    new_amount = float(sys.argv[amt_idx + 1])
+                except (IndexError, ValueError):
+                    print("❗ Invalid amount.")
+                    return
+
+            update_expense(expense_id, new_desc, new_amount)
+        else:
+            print("❗ Please provide an expense ID using --id")
     else:
         show_summary()
+
 
 if __name__ == "__main__":
     main()
