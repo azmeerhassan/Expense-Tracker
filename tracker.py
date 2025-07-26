@@ -57,10 +57,33 @@ def delete_expense(expense_id):
         save_expenses(expenses)
         print(f"🗑️ Expense with ID {expense_id} deleted successfully.")
 
-def show_summary():
+from datetime import datetime
+
+def show_summary(month=None):
     expenses = load_expenses()
-    total = sum(e["amount"] for e in expenses)
-    print(f"💰 Total expenses: ${total:.2f}")
+
+    if month:
+        try:
+            month = int(month)
+            if not (1 <= month <= 12):
+                print("❗ Month must be between 1 and 12.")
+                return
+        except ValueError:
+            print("❗ Invalid month. Please provide a number between 1 and 12.")
+            return
+
+        current_year = datetime.now().year
+        filtered = [
+            e for e in expenses
+            if datetime.strptime(e["date"], "%Y-%m-%d").month == month and
+               datetime.strptime(e["date"], "%Y-%m-%d").year == current_year
+        ]
+        total = sum(e["amount"] for e in filtered)
+        print(f"📆 Total expenses for {datetime(1900, month, 1).strftime('%B')}: ${total:.2f}")
+    else:
+        total = sum(e["amount"] for e in expenses)
+        print(f"💰 Total expenses: ${total:.2f}")
+
 
 
 # 🔹 Main CLI Handler
@@ -96,14 +119,14 @@ def main():
             print("❗ Missing --id argument.")
         
     elif sys.argv[1] == "summary":
-        show_summary()
-
-    # Handle unknown commands
+        if "--month" in sys.argv:
+            idx = sys.argv.index("--month")
+            if idx + 1 < len(sys.argv):
+                show_summary(sys.argv[idx + 1])
+        else:
+            print("❗ Please provide a month number after --month")
     else:
-        print("❗ Unknown command. Supported: add, list, delete, summary")
-
-    
-
+        show_summary()
 
 if __name__ == "__main__":
     main()
